@@ -20,15 +20,7 @@ print(bool(0), 'is False, because it`s boolean of 0')
 
 #####################
 
-x = bool(True)
-
-def myfunc(y):
-    if y is True:
-        print("Hello, World!")
-    else:
-        print("You are not welcommed")
-
-print(myfunc(x))
+print(bool(['a','b','c'])) #Even list can be True
 
 
 

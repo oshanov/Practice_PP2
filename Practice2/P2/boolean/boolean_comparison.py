@@ -6,6 +6,12 @@ else:
     print('no')
 ######################################
 
+a = 5
+b = a
+print(a is b)
+
+#######################################
+
 print("Proposition \"x is 11\" is",bool(x == 11))
 print("Proposition \"x is not 11\" is",bool(x != 11))
 
