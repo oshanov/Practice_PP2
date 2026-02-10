@@ -1,16 +1,21 @@
-# a = [5,4,3,2,1]
-# for i in a:
-#     print(i)
+class Playlist:
+    def __init__(self, name):
+        self.name = name
+        self.songs =[]
+    def song_add(self,song):
+        self.songs.append(song)
+        print(f'{song} added')
+    def song_del(self,song):
+        if song in self.songs:
+            self.songs.remove(song)
+        print(f'{song} deleted')
+    def show(self):
+        print(f'Playlist {self.name}:')
+        for i in self.songs:
+            print(i)
 
-# a.append(23)
-# print(a)
-
-# a.pop(0)
-# print(a)
-
-# print(len(a))
-# /////////////////////////
-# s = 'Hello'
-# for i in range(len(s)):
-#     print(s[i])
-# ////////////////////////
+myplay = Playlist('Sleep')
+myplay.song_add('Not Like Us')
+myplay.song_add('GIRL LIKE ME')
+myplay.show()
+del Playlist.show
