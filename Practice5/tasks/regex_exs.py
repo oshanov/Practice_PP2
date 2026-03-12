@@ -4,7 +4,7 @@ txt = input() #abbb
 y = re.search('ab*', txt) 
 if y:
     print('Yes')
-########################
+######################
 y = re.fullmatch('ab{2,3}', txt)
 if y: 
     print("Yes")
