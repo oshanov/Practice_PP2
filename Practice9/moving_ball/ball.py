@@ -9,7 +9,6 @@ class Ball:
         self.velocity_y = 0
         self.gravity = 0.8
         self.jump_power = -20
-        self.velocity_x = 20
 
     def jump(self):
         if self.y >= 575:

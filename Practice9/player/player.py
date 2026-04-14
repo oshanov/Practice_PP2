@@ -4,10 +4,10 @@ import random
 class Player:
     def __init__(self):
         self._songs = [
-            'Tame Impala - Let It Happen.mp3',
-            'Tame Impala - The Less I Know The Better.mp3',
-            'Иван Дорн - Северное Сияние.mp3',
-            'Bad Bunny - BAILE INoLVIDABLE.mp3'
+            r'C:\\git_practice\\Practice9\\player\\music\\Tame Impala - Let It Happen.mp3',
+            r'C:\\git_practice\\Practice9\\player\\music\\Tame Impala - The Less I Know The Better.mp3',
+            r'C:\\git_practice\\Practice9\\player\\music\\Иван Дорн - Северное Сияние.mp3',
+            r'C:\\git_practice\\Practice9\\player\\music\\Bad Bunny - BAILE INoLVIDABLE.mp3'
         ]
         self.shuffled_queue = list(self._songs)
         random.shuffle(self.shuffled_queue)
@@ -20,7 +20,9 @@ class Player:
         song = self.shuffled_queue[self.current_track_index]
         pygame.mixer.music.load(song)
         pygame.mixer.music.play()
-        self.current_song_name = song.replace('.mp3', '')
+        some = song.replace(r'C:\\git_practice\\Practice9\\player\\music\\', '')
+        self.current_song_name = some.replace('.mp3', '')
+
         self.paused = False
 
     def next_song(self):
