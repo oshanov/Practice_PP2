@@ -1,58 +1,48 @@
-import json, re
+# import pygame
 
-x = '''
-{
- "Ali": "ali@gmail.com",
- "Dana": "dana.mail.com",
- "Arman": "arman@mail.ru",
- "Serega": "sergei@mail"
-}
-'''
+# pygame.init()
+# screen = pygame.display.set_mode((400,300))
+# pygame.display.set_caption('test')
+# clock = pygame.time.Clock()
+# # pygame.display.update()
+# x = 30
+# y = 30
 
-data = json.loads(x)
+# done = False
+# is_blue = True
 
-for name, email in data.items():
-    if re.search(r'\S+@\S+\.\S+', email):
-      print(name)
+# while not done:
+#     for event in pygame.event.get():
+#         if event.type == pygame.QUIT:
+#             pygame.quit()
+#             done = True
+        
+#         if event.type == pygame.KEYDOWN and (event.key == pygame.K_SPACE):
+#             is_blue = not is_blue
 
-######################
+#     pressed = pygame.key.get_pressed()
+#     if pressed[pygame.K_UP]: y -= 3
+#     if pressed[pygame.K_DOWN]: y += 3
+#     if pressed[pygame.K_LEFT]: x -= 3
+#     if pressed[pygame.K_RIGHT]: x += 3
 
-from datetime import datetime
+#     screen.fill((0,0,0))
 
-dates = [
-"2026-3-21",
-"2026-4-10",
-"2026-3-25",
-"2026-5-1"
-]
-parsed = []
-for i in dates:
-   parsed.append(datetime.strptime(i,'%Y-%m-%d'))
+#     if is_blue: color = (0,128,255)
+#     else: color = (255,100,0)
+#     pygame.draw.rect(screen, color, pygame.Rect(x,y,60,60))
 
-diff = ((max(parsed) - min(parsed)).days)
-print(diff)
+#     pygame.display.flip()
+#     clock.tick(60)
 
 
-x = '''
-[
- {"name":"Ali","score":90},
- {"name":"Dana","score":85},
- {"name":"Arman","score":95},
- {"name":"Serega","score":70}
-]
-'''
+n = int(input())
+def gen(n):
+    count = 0
+    while count <= n:
+        yield count
+        count += 1
 
-data = json.loads(x)
-# maxim = 0
-# for i in data:
-#    if i['score'] > maxim:
-#       maxim = i['score']
-
-print((max(data, key=lambda x: x['score']))['name'])
-
-x = "Today I have 12 apples and 5 bananas and 100 oranges"
-some = re.findall(r'\d+', x)
-some = list(some)
-for i in some:
-   i = int(i)
-print(sum(some))
+x = gen(n)
+for i in x:
+    print(i)
