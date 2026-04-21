@@ -41,7 +41,6 @@ def show_score(choice,color,font,size):
     score_rect = score_surface.get_rect()
     screen.blit(score_surface, score_rect)
 
-    # Текст уровня под счётом
     level_surface = score_font.render('Level: ' + str(level), True, YELLOW)
     level_rect = level_surface.get_rect()
     level_rect.topleft = (0, 25)
