@@ -9,7 +9,7 @@ WHITE = (255,255,255)
 GREEN = (0,255,0)
 RED = (255,0,0)
 BLUE = (0,0,255)
-YELLOW = (255, 220, 0)  # Добавлен жёлтый для текста уровня
+YELLOW = (255, 220, 0)  
 
 #Initialization
 pygame.init()
@@ -31,9 +31,9 @@ direction = 'RIGHT'
 change_to = direction
 
 score = 0
-level = 1           # Текущий уровень
-food_eaten = 0      # Сколько еды съедено на этом уровне
-speed = 10          # Скорость (вместо фиксированного 10 в clock.tick)
+level = 1           
+food_eaten = 0      
+speed = 10          
 
 def show_score(choice,color,font,size):
     score_font = pygame.font.SysFont(font,size)
@@ -98,9 +98,8 @@ while True:
     if snake_pos[0] == fruit_position[0] and snake_pos[1] == fruit_position[1]:
         score += 10
         fruit_spawn = False
-        food_eaten += 1  # Считаем съеденную еду
+        food_eaten += 1  #Counting food
 
-        # Каждые 3 еды — новый уровень
         if food_eaten % 3 == 0:
             level += 1
             speed += 2
@@ -139,4 +138,4 @@ while True:
     pygame.display.update()
 
     #FPS
-    clock.tick(speed)  # Теперь speed растёт с уровнем
+    clock.tick(speed)  

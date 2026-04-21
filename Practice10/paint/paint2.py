@@ -9,7 +9,6 @@ def main():
     radius = 15
     mode = 'pen'        # pen / rect / circle / eraser
     color = (100, 100, 255)
-
     points = []
 
 
@@ -102,7 +101,6 @@ def main():
       
         screen.blit(canvas, (0, 0))
 
-        # Подсказки в углу
         hints = [
             f'Mode: {mode}  (P/R/C/E)',
             f'Color: 1-6',
