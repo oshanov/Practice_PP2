@@ -1,5 +1,0 @@
-a = float(3.4)
-b = float(77)
-c = float("56")
-d = float("4.67")
-print(a, b, c, d, type(a), type(b), type(c), type(d))

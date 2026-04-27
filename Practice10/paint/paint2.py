@@ -39,22 +39,34 @@ def main():
                     return
 
                 #Instruments
-                if event.key == pygame.K_p: mode = 'pen'
-                if event.key == pygame.K_r: mode = 'rect'
-                if event.key == pygame.K_c: mode = 'circle'
-                if event.key == pygame.K_e: mode = 'eraser'
+                if event.key == pygame.K_p: 
+                    mode = 'pen'
+                if event.key == pygame.K_r: 
+                    mode = 'rect'
+                if event.key == pygame.K_c: 
+                    mode = 'circle'
+                if event.key == pygame.K_e: 
+                    mode = 'eraser'
 
                 #Colors
-                if event.key == pygame.K_1: color = (255, 255, 255)  #white
-                if event.key == pygame.K_2: color = (255, 0,   0  )  #red
-                if event.key == pygame.K_3: color = (0,   255, 0  )  #green
-                if event.key == pygame.K_4: color = (100, 100, 255)  #blue
-                if event.key == pygame.K_5: color = (255, 255, 0  )  #yellow
-                if event.key == pygame.K_6: color = (255, 165, 0  )  #orange
+                if event.key == pygame.K_1: 
+                    color = (255, 255, 255)  #white
+                if event.key == pygame.K_2: 
+                    color = (255, 0,   0  )  #red
+                if event.key == pygame.K_3: 
+                    color = (0,   255, 0  )  #green
+                if event.key == pygame.K_4: 
+                    color = (100, 100, 255)  #blue
+                if event.key == pygame.K_5: 
+                    color = (255, 255, 0  )  #yellow
+                if event.key == pygame.K_6: 
+                    color = (255, 165, 0  )  #orange
 
                 #Size
-                if event.key == pygame.K_UP:   radius = min(60, radius + 2)
-                if event.key == pygame.K_DOWN: radius = max(1,  radius - 2)
+                if event.key == pygame.K_UP:   
+                    radius = min(60, radius + 2)
+                if event.key == pygame.K_DOWN: 
+                    radius = max(1,  radius - 2)
 
                 #Deleting
                 if event.key == pygame.K_DELETE:

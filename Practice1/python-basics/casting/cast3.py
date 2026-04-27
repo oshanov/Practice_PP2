@@ -1,6 +1,0 @@
-x = str(3.4)
-y = str(78) 
-z = str("56")
-k = str("Hello, World!")
-print(x, y, z, k)
-print(type(x), type(y), type(z), type(k))
