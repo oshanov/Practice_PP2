@@ -1,6 +1,12 @@
 [
     {
         "name": "Player",
+        "score": 4322,
+        "dist": 2922,
+        "coins": 28
+    },
+    {
+        "name": "Player",
         "score": 670,
         "dist": 470,
         "coins": 4

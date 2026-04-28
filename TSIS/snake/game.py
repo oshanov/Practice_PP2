@@ -59,7 +59,7 @@ class Game:
         self._regenerate_obstacles()
         self._spawn_food()
 
-    # ───────── FPS (ВМЕСТО @property) ─────────
+    #FPS
     def get_fps(self):
         base = BASE_FPS + (self.level - 1) * SPEED_PER_LEVEL
 
@@ -70,12 +70,12 @@ class Game:
 
         return base
 
-    # ───────── TURN ─────────
+    #Turn
     def turn(self, d):
         if (d[0] + self.dir[0], d[1] + self.dir[1]) != (0, 0):
             self.next_dir = d
 
-    # ───────── STEP ─────────
+    #Step
     def step(self):
         if self.over:
             return
@@ -150,7 +150,7 @@ class Game:
             self._activate_powerup(self.powerup.kind)
             self.powerup = None
 
-    # ───────── HELPERS ─────────
+    #Helpers
     def _food_at(self, pos):
         for f in self.foods:
             if f.pos == pos:
@@ -170,7 +170,7 @@ class Game:
             self.level = new_level
             self._regenerate_obstacles()
 
-    # ───────── SPAWN ─────────
+    #Spawn
     def _free_cells(self):
         used = set(self.snake) | self.obstacles | {f.pos for f in self.foods}
         if self.powerup:
@@ -226,7 +226,7 @@ class Game:
         else:
             self.effect_until = pygame.time.get_ticks() + POWERUP_DURATION_MS
 
-    # ───────── OBSTACLES ─────────
+    #Obstacles
     def _regenerate_obstacles(self):
         self.obstacles.clear()
 
