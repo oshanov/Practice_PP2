@@ -9,7 +9,7 @@ pygame.mixer.init()
 #Config
 WIDTH, HEIGHT = 500, 700
 FPS = 60
-ROAD_SCROLL = 6
+BASE_ROAD_SCROLL = 6   
 FONT     = pygame.font.SysFont("Arial", 20)
 FONT_SM  = pygame.font.SysFont("Arial", 16)
 BIG      = pygame.font.SysFont("Arial", 44, bold=True)
@@ -40,8 +40,8 @@ SETTINGS_FILE    = "settings.json"
 #Def. settings
 DEFAULT_SETTINGS = {
     "sound":      True,
-    "car_color":  "default",   # "default" | "red" | "blue" | "green" | "purple"
-    "difficulty": "normal"     # "easy" | "normal" | "hard"
+    "car_color":  "default",
+    "difficulty": "normal"
 }
 
 #Difficulty
@@ -80,7 +80,6 @@ def tinted_surface(base: pygame.Surface, color: tuple) -> pygame.Surface:
     overlay.fill(color + (160,))
     tinted.blit(overlay, (0, 0), special_flags=pygame.BLEND_RGBA_MULT)
     return tinted
-
 
 
 def load_settings() -> dict:
@@ -123,7 +122,6 @@ class Button:
         return self.rect.collidepoint(pos)
 
 class ToggleButton(Button):
-    #On\off
     def __init__(self, x, y, w, h, label: str, state: bool):
         super().__init__(x, y, w, h, label)
         self.label = label
@@ -140,6 +138,8 @@ class ToggleButton(Button):
 
 #Entities
 class Player:
+    NITRO_MULT = 1.8  
+
     def __init__(self, car_img):
         self.img    = car_img
         self.x      = WIDTH // 2
@@ -158,9 +158,10 @@ class Player:
         self.shield = 0
         self.nitro  = 0
 
-    def move(self, dx, dy):
-        self.x += dx * self.speed
-        self.y += dy * self.speed
+    def move(self, dx, dy, nitro_active=False):
+        spd = self.speed * self.NITRO_MULT if nitro_active else self.speed
+        self.x += dx * spd
+        self.y += dy * spd
         self.x = max(0, min(WIDTH - 50, self.x))
         self.y = max(0, min(HEIGHT - 100, self.y))
 
@@ -172,6 +173,8 @@ class Player:
         s.blit(self.img, (self.x, self.y))
         if self.shield > 0:
             pygame.draw.circle(s, SHIELD_COLOR, (self.x + 25, self.y + 40), 50, 2)
+        if self.nitro > 0:
+            pygame.draw.circle(s, NITRO_COLOR, (self.x + 25, self.y + 40), 55, 3)
 
 class Coin:
     VALUE = 5
@@ -181,7 +184,7 @@ class Coin:
         self.x = random.randint(50, WIDTH - 50)
         self.y = -self.SIZE
 
-    def update(self): self.y += ROAD_SCROLL
+    def update(self, scroll): self.y += scroll
 
     def draw(self, s):
         s.blit(COIN_IMG, (self.x - self.SIZE // 2, int(self.y) - self.SIZE // 2))
@@ -192,7 +195,8 @@ class Enemy:
         self.y     = -100
         self.speed = speed
 
-    def update(self): self.y += self.speed
+
+    def update(self, extra=0): self.y += self.speed + extra
     def draw(self, s): s.blit(ENEMY_IMG, (self.x, self.y))
 
 class Obstacle:
@@ -201,12 +205,12 @@ class Obstacle:
         self.y = -50
         self.t = t
 
-    def update(self): self.y += ROAD_SCROLL
+    def update(self, scroll): self.y += scroll
 
     def draw(self, s):
-        if   self.t == "barrier":    pygame.draw.rect(s, BLACK,  (self.x, self.y, 50, 50))
+        if   self.t == "barrier":    pygame.draw.rect(s, BLACK,  (self.x, self.y, 50, 20))
         elif self.t == "speed_bump": pygame.draw.rect(s, GRAY,   (self.x, self.y, 50, 20))
-        elif self.t == "boost":      pygame.draw.rect(s, ORANGE, (self.x, self.y, 50, 20))
+        elif self.t == "boost":      pygame.draw.rect(s, GREEN,  (self.x, self.y, 50, 20))
 
 class PowerUp:
     def __init__(self):
@@ -214,7 +218,7 @@ class PowerUp:
         self.y = -40
         self.t = random.choice(["shield", "nitro", "repair"])
 
-    def update(self): self.y += ROAD_SCROLL
+    def update(self, scroll): self.y += scroll
 
     def draw(self, s):
         c = SHIELD_COLOR if self.t == "shield" else NITRO_COLOR if self.t == "nitro" else REPAIR_COLOR
@@ -223,6 +227,8 @@ class PowerUp:
 #Game
 class Game:
     SPAWN_MIN_DIST = 80
+    NITRO_SCROLL   = 11   
+    BASE_SCROLL    = 6    
 
     def __init__(self):
         self.s = pygame.display.set_mode((WIDTH, HEIGHT))
@@ -238,7 +244,6 @@ class Game:
         self.reset_game()
         self._build_buttons()
 
-    #Helpers
     def _build_car_img(self) -> pygame.Surface:
         color = CAR_COLORS[self.settings.get("car_color", "default")]
         if color is None:
@@ -253,21 +258,16 @@ class Game:
             return Button(cx - BW // 2, y, BW, BH, text, color)
 
         self.buttons = {
-            #Main menu
             "play":        btn(200, "PLAY"),
             "lb":          btn(255, "LEADERBOARD"),
             "settings":    btn(310, "SETTINGS"),
             "quit":        btn(365, "QUIT"),
-            #Game Over
             "retry":       btn(430, "RESTART"),
             "back":        btn(485, "MENU"),
-            #Leaderboard / Settings
             "back2":       Button(cx - BW // 2, 620, BW, BH, "BACK"),
-            #Difficulty
             "diff_easy":   Button(cx - 200, 300, 110, 38, "EASY"),
             "diff_normal": Button(cx -  55, 300, 110, 38, "NORMAL"),
             "diff_hard":   Button(cx +  90, 300, 110, 38, "HARD"),
-            #Car color
             "col_default": Button(cx - 210, 410, 70, 34, "DEF"),
             "col_red":     Button(cx - 130, 410, 70, 34, "RED"),
             "col_blue":    Button(cx -  50, 410, 70, 34, "BLUE"),
@@ -279,18 +279,19 @@ class Game:
                                     "SOUND", self.settings["sound"])
 
     def reset_game(self):
-        self.coins       = []
-        self.enemies     = []
-        self.obs         = []
-        self.pups        = []
-        self.score       = 0
-        self.dist        = 0
-        self.coins_total = 0
+        self.coins        = []
+        self.enemies      = []
+        self.obs          = []
+        self.pups         = []
+        self.score        = 0
+        self.dist         = 0
+        self.coins_total  = 0
         diff = self.settings.get("difficulty", "normal")
         self.enemy_speed  = DIFFICULTY_PARAMS[diff]["enemy_speed"]
         self.spawn_chance = DIFFICULTY_PARAMS[diff]["spawn_chance"]
+        self.road_scroll  = self.BASE_SCROLL
+        self.nitro_active = False
 
-    #Spawn
     def _all_objects(self):
         return self.coins + self.enemies + self.obs + self.pups
 
@@ -330,7 +331,6 @@ class Game:
             if x is not None:
                 p = PowerUp(); p.x = x; self.pups.append(p)
 
-    #Collisions
     def hit(self, a, b):
         return abs(a.x - b.x) < 40 and abs(a.y - b.y) < 60
 
@@ -370,13 +370,22 @@ class Game:
         data = sorted(data, key=lambda x: x["score"], reverse=True)[:10]
         save_lb(data)
 
-    #Game cycle
     def update(self):
         self.dist  += 1
         self.score += 1
+
+        self.nitro_active = self.player.nitro > 0
+        self.road_scroll  = self.NITRO_SCROLL if self.nitro_active else self.BASE_SCROLL
+
         self.player.update()
-        for lst in [self.coins, self.enemies, self.obs, self.pups]:
-            for obj in lst: obj.update()
+
+        for obj in self.coins: obj.update(self.road_scroll)
+        for obj in self.obs:   obj.update(self.road_scroll)
+        for obj in self.pups:  obj.update(self.road_scroll)
+
+        nitro_extra = (self.NITRO_SCROLL - self.BASE_SCROLL) if self.nitro_active else 0
+        for obj in self.enemies: obj.update(nitro_extra)
+
         self.coins   = [c for c in self.coins   if c.y < HEIGHT]
         self.enemies = [e for e in self.enemies  if e.y < HEIGHT]
         self.obs     = [o for o in self.obs      if o.y < HEIGHT]
@@ -390,11 +399,12 @@ class Game:
         self.player.draw(self.s)
         for lst in [self.coins, self.enemies, self.obs, self.pups]:
             for obj in lst: obj.draw(self.s)
-        self.s.blit(FONT.render(
-            f"Score:{self.score} HP:{self.player.hp} Coins:{self.coins_total} Dist:{self.dist}",
-            True, WHITE), (10, 10))
 
-    #Screens
+        nitro_str = f" NITRO:{self.player.nitro}" if self.nitro_active else ""
+        self.s.blit(FONT.render(
+            f"Score:{self.score} HP:{self.player.hp} Coins:{self.coins_total} Dist:{self.dist}{nitro_str}",
+            True, NITRO_COLOR if self.nitro_active else WHITE), (10, 10))
+
     def screen_menu(self):
         self.s.fill(BLACK)
         self.s.blit(BIG.render("RACER", True, WHITE), (180, 100))
@@ -405,19 +415,15 @@ class Game:
         self.s.fill(BLACK)
         self.s.blit(BIG.render("SETTINGS", True, WHITE), (150, 40))
 
-        #Sound
         self.s.blit(FONT.render("Sound:", True, WHITE), (30, 160))
         self.snd_btn.draw(self.s)
 
-        #Difficulty
         self.s.blit(FONT.render("Difficulty:", True, WHITE), (30, 260))
         cur_diff = self.settings["difficulty"]
         for key, val in [("diff_easy","easy"),("diff_normal","normal"),("diff_hard","hard")]:
-            #*
             self.buttons[key].text = ("*" if cur_diff == val else "") + val.upper()
             self.buttons[key].draw(self.s)
 
-        #Color
         self.s.blit(FONT.render("Car Color:", True, WHITE), (30, 370))
         cur_col = self.settings["car_color"]
         for key, val in [("col_default","default"),("col_red","red"),
@@ -456,7 +462,6 @@ class Game:
         self.buttons["retry"].draw(self.s)
         self.buttons["back"].draw(self.s)
 
-    #Game cycle
     def run(self):
         running = True
         while running:
@@ -482,26 +487,22 @@ class Game:
                             running = False
 
                     elif self.state == "settings":
-                        #Sound
                         if self.snd_btn.click(pos):
                             self.snd_btn.toggle()
                             self.settings["sound"] = self.snd_btn.state
                             save_settings(self.settings)
-                        #Difficulty
                         for key, val in [("diff_easy","easy"),
                                          ("diff_normal","normal"),
                                          ("diff_hard","hard")]:
                             if self.buttons[key].click(pos):
                                 self.settings["difficulty"] = val
                                 save_settings(self.settings)
-                        #Color
                         for key, val in [("col_default","default"),("col_red","red"),
                                          ("col_blue","blue"),("col_green","green"),
                                          ("col_purple","purple")]:
                             if self.buttons[key].click(pos):
                                 self.settings["car_color"] = val
                                 save_settings(self.settings)
-                        #Back
                         if self.buttons["back2"].click(pos):
                             self.state = "menu"
 
@@ -517,7 +518,6 @@ class Game:
                         if self.buttons["back2"].click(pos):
                             self.state = "menu"
 
-            #Moves only when play
             if self.state == "play":
                 keys = pygame.key.get_pressed()
                 dx = dy = 0
@@ -525,9 +525,8 @@ class Game:
                 if keys[pygame.K_RIGHT]: dx =  1
                 if keys[pygame.K_UP]:    dy = -1
                 if keys[pygame.K_DOWN]:  dy =  1
-                self.player.move(dx, dy)
+                self.player.move(dx, dy, nitro_active=self.nitro_active)
 
-            #Render
             if   self.state == "menu":        self.screen_menu()
             elif self.state == "play":        self.update(); self.draw()
             elif self.state == "settings":    self.screen_settings()
